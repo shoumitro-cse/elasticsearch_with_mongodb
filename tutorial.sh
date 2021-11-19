@@ -3,6 +3,10 @@
 
 Data Dump from django app
 # https://coderwall.com/p/mvsoyg/django-dumpdata-and-loaddata
+python manage.py dumpdata cars.Car > cars.json
+python manage.py dumpdata cars.Manufacturer > manufacturers.json
+python manage.py loaddata cars/fixtures/manufacturers.json
+python manage.py loaddata cars/fixtures/cars.json
 
 # user: shoumitro
 # pw: Sr12345678

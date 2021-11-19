@@ -1,7 +1,7 @@
 from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 
-from my_elasticsearch_example.utils import wait_elasticsearch_availability
+from elastic_search.utils import wait_elasticsearch_availability
 
 
 class Command(BaseCommand):
