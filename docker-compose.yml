@@ -1,27 +1,55 @@
-version: "3"
+version: '3.7'
+
 
 services:
-  elasticsearch:
-    image: blacktop/elasticsearch:6.7.1
-  db:
-    image: postgres:11.3-alpine
-  django:
-    image: django_app:latest
+
+  web_app:
+    container_name: web_app
     build:
       context: .
-      dockerfile: compose/django/Dockerfile
-    command: >
-      /bin/bash -c "
-        while ! curl -X GET elasticsearch:9200/_cluster/health --silent;
-        do
-          sleep 1;
-        done;
-        python manage.py runserver 0.0.0.0:8000
-      "
-    volumes:
-      - .:/code
+      dockerfile: Dockerfile
+    command: sh -c "python manage.py makemigrations &&
+      python manage.py migrate && python manage.py search_index --rebuild &&
+      python manage.py runserver 0.0.0.0:8000"
     ports:
-      - "8000:8000"
+      - 8001:8000
+    volumes:
+      - .:/app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
-      - db
+      - mongodb
       - elasticsearch
+
+  mongodb:
+    container_name: mongodb
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_vol:/data/db
+      
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.12.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      #- cluster.name=docker-cluster
+      #- bootstrap.memory_lock=true
+      #- "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata1:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+
+volumes:
+  mongodb_vol:
+  esdata1:
+  
