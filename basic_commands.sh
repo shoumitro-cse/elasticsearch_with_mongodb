@@ -28,10 +28,6 @@ python manage.py loaddata cars/fixtures/manufacturers.json
 python manage.py loaddata cars/fixtures/cars.json
 python manage.py runserver 127.0.0.1:8000
 
-# enter docker container
-docker exec -it web_app bash
-python manage.py search_index --create 
-python manage.py search_index --rebuild
     
 # This line is used to create es index
 python manage.py search_index --rebuild
